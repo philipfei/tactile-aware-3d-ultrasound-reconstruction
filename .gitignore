@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.h5
+*.npy
+*.pth
+data/plotting/
+results/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
