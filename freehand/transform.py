@@ -1,40 +1,20 @@
+"""
+Geometric transforms between image, tool (probe marker) and world frames.
+
+All transforms are 4x4 homogeneous matrices applied by left-multiplication:
+    T{image->world} = T{tool->world} @ T_cal
+    pts{world} = T{tool->world} @ T_cal @ pts{image}
+where T_cal = T{image->tool} is the calibration matrix and pts{image} are the
+four image corner points (pixels).
+
+The relative transform between two frames,
+    T{tool1->tool0} = T{tool0->world}^-1 @ T{tool1->world},
+is independent of the world frame; it is the quantity the network predicts.
+Chained relative transforms give the pose relative to an earlier frame:
+    T{tool2->tool0} = T{tool1->tool0} @ T{tool2->tool1}
+"""
 
 import torch
-
-''' Geometric transformation used in transforms:
-Use left-multiplication:
-    T{image->world} = T{tool->world} * T{image->tool} 
-    T{image->tool} is the calibration matrix: T_calib
-    pts{tool} = T{image->tool} * pts{image}
-    pts{world} = T{image->world} * pts{image}
-        where pts{image1} are four (corners) or five (and centre) image points in the image coordinate system.
-
-The ImagePointTransformLoss 
-    - a pair of "past" and "pred" images, image0 and image1
-    - a pair of ground-truth (GT) and predicted (Pred) transformation
-    pts{world} = T{tool0->world} * T_calib * pts{image0}
-    pts{world} = T{tool1->world} * T_calib * pts{image1}
-    => T{tool0->world} * T_calib * pts{image0} = T{tool1->world} * T_calib * pts{image1}
-    => pts{image0} = T_calib^(-1) * T{tool0->world}^(-1) * T{tool1->world} * T_calib * pts{image1}
-    => pts{image0} = T_calib^(-1) * T(tool1->tool0) * T_calib * pts{image1}
-
-Denote world-coordinates-independent transformation, 
-    T(tool1->tool0) = T{tool0->world}^(-1) * T{tool1->world}, 
-    which can be predicted and its GT can be obtained from the tracker.
-When image_coords = True (pixel): 
-    => loss = ||pts{image0}^{GT} - pts{image0}^{Pred}||
-When image_coords = False (mm):
-    => loss = ||pts{tool0}^{GT} - pts{tool0}^{Pred}||
-        where pts{tool0} = T(tool1->tool0) * T_calib * pts{image1}
-
-Accumulating transformations using TransformAccumulation class:
-    e.g. working in tool coordinates, so round-off error does not accumulate on calibration
-    Given often-predicted T(tool1->tool0) and then T(tool2->tool1):
-        T(tool2->tool0) = T(tool1->tool0) * T(tool2->tool1)
-    Similarly then: 
-        pts{image0} = T_calib^(-1) * T(tool2->tool0) * T_calib * pts{image2}
-
-'''
 
 
 class LabelTransform():

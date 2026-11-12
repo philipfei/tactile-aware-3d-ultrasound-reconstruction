@@ -249,7 +249,7 @@ def check_one_h5(h5_path, split_label, global_stats):
                     ax_imu.plot(range(n_frames), sensor_kept[:, 0], label='lin_acc_x', color='r', alpha=0.8)
                     ax_imu.plot(range(n_frames), sensor_kept[:, 1], label='lin_acc_y', color='g', alpha=0.8)
                     ax_imu.plot(range(n_frames), sensor_kept[:, 2], label='lin_acc_z', color='b', alpha=0.8)
-                    ax_imu.set_title("4. IMU Linear Acceleration (norm. by 0.2g)")
+                    ax_imu.set_title("4. IMU Linear Acceleration (norm. by 0.02g)")
                     ax_imu.legend(loc="upper right", fontsize=7)
                     ax_imu.grid(True, linestyle=':', alpha=0.7)
                     ax_imu.set_xlabel("Frame index")
